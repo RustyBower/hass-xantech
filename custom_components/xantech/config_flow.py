@@ -24,7 +24,7 @@ from homeassistant.helpers.selector import (
     TextSelectorConfig,
     TextSelectorType,
 )
-from pyxantech import async_get_amp_controller
+from pyxantech import async_get_amp_controller, get_device_config
 from serial import SerialException
 import voluptuous as vol
 
@@ -43,6 +43,9 @@ from .const import (
 )
 
 LOG = logging.getLogger(__name__)
+
+# type alias to reduce line length in signatures
+ZonesDict = dict[int, dict[str, str]]
 
 
 class XantechConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -115,7 +118,9 @@ class XantechConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             # parse zones configuration
             zones_text = user_input.get('zones_config', '')
-            zones = self._parse_zones_config(zones_text)
+            zones = self._parse_zones_config(
+                zones_text, self._data.get(CONF_AMP_TYPE)
+            )
 
             if not zones:
                 errors['base'] = 'invalid_zones'
@@ -197,12 +202,15 @@ class XantechConfigFlow(ConfigFlow, domain=DOMAIN):
             },
         )
 
-    def _parse_zones_config(self, text: str) -> dict[int, dict[str, str]]:
+    def _parse_zones_config(
+        self, text: str, amp_type: str | None = None,
+    ) -> ZonesDict:
         """Parse zone configuration text into structured dict.
 
         Format: 'zone_id: zone_name' per line
+        Validates zone IDs against device config when amp_type provided.
         """
-        zones: dict[int, dict[str, str]] = {}
+        zones: ZonesDict = {}
         for line in text.strip().split('\n'):
             line = line.strip()
             if not line or ':' not in line:
@@ -213,6 +221,18 @@ class XantechConfigFlow(ConfigFlow, domain=DOMAIN):
                 zones[zone_id] = {'name': name.strip()}
             except ValueError:
                 continue
+
+        if amp_type and zones:
+            valid_zones = (
+                get_device_config(amp_type, 'zones') or {}
+            )
+            alt_zones = get_device_config(
+                amp_type, 'alternative_zones', log_missing=False,
+            ) or {}
+            all_valid = {**valid_zones, **alt_zones}
+            if any(z not in all_valid for z in zones):
+                return {}
+
         return zones
 
     def _parse_sources_config(self, text: str) -> dict[int, dict[str, str]]:
@@ -243,9 +263,11 @@ class XantechConfigFlow(ConfigFlow, domain=DOMAIN):
         if amp_type == 'dax88':
             return (
                 '11: Living Room\n12: Kitchen\n13: Master Bedroom\n'
-                '14: Office\n15: Patio\n16: Dining Room\n17: Garage\n18: Basement'
+                '14: Office\n15: Patio\n16: Dining Room\n'
+                '17: Garage\n18: Basement'
             )
-        # default to xantech8
+        # xantech8: most models (MRC88, MX88) use 11-18 addressing;
+        # older MRAUDIO8x8 standalone units also accept 1-8
         return (
             '11: Living Room\n12: Kitchen\n13: Master Bedroom\n'
             '14: Office\n15: Patio\n16: Dining Room'
@@ -360,7 +382,8 @@ class XantechOptionsFlow(OptionsFlow):
 
         if user_input is not None:
             zones_text = user_input.get('zones_config', '')
-            zones = self._parse_zones_config(zones_text)
+            amp_type = self.config_entry.data.get(CONF_AMP_TYPE)
+            zones = self._parse_zones_config(zones_text, amp_type)
 
             if not zones:
                 errors['base'] = 'invalid_zones'
@@ -437,9 +460,11 @@ class XantechOptionsFlow(OptionsFlow):
             },
         )
 
-    def _parse_zones_config(self, text: str) -> dict[int, dict[str, str]]:
+    def _parse_zones_config(
+        self, text: str, amp_type: str | None = None,
+    ) -> ZonesDict:
         """Parse zone configuration text into structured dict."""
-        zones: dict[int, dict[str, str]] = {}
+        zones: ZonesDict = {}
         for line in text.strip().split('\n'):
             line = line.strip()
             if not line or ':' not in line:
@@ -450,6 +475,18 @@ class XantechOptionsFlow(OptionsFlow):
                 zones[zone_id] = {'name': name.strip()}
             except ValueError:
                 continue
+
+        if amp_type and zones:
+            valid_zones = (
+                get_device_config(amp_type, 'zones') or {}
+            )
+            alt_zones = get_device_config(
+                amp_type, 'alternative_zones', log_missing=False,
+            ) or {}
+            all_valid = {**valid_zones, **alt_zones}
+            if any(z not in all_valid for z in zones):
+                return {}
+
         return zones
 
     def _parse_sources_config(self, text: str) -> dict[int, dict[str, str]]:

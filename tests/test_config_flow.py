@@ -12,7 +12,6 @@ from serial import SerialException
 from custom_components.xantech.const import (
     CONF_AMP_TYPE,
     CONF_PORT,
-    CONF_SCAN_INTERVAL,
     DOMAIN,
 )
 
@@ -220,3 +219,43 @@ def test_options_flow_stores_config_entry_correctly() -> None:
     assert hasattr(flow, '_config_entry'), 'Flow must store entry in _config_entry'
     assert flow._config_entry is mock_entry
     assert flow._config_entry.data['port'] == '/dev/ttyUSB0'
+
+
+def test_xantech8_default_zones_use_double_digit() -> None:
+    """Test that xantech8 config flow defaults use double-digit zone IDs.
+
+    Most xantech8 models (MRC88, MX88) use two-digit addressing (11-18).
+    Standalone MRAUDIO8x8 also accepts 1-8, but defaults target the common case.
+    """
+    from custom_components.xantech.config_flow import XantechConfigFlow
+
+    flow = XantechConfigFlow()
+    defaults = flow._get_default_zones_text('xantech8')
+
+    for line in defaults.strip().split('\n'):
+        zone_id = int(line.split(':')[0].strip())
+        assert 11 <= zone_id <= 18, f'xantech8 default zone {zone_id} should be 11-18'
+
+
+def test_monoprice6_default_zones_use_double_digit() -> None:
+    """Test that monoprice6 config flow defaults use double-digit zone IDs."""
+    from custom_components.xantech.config_flow import XantechConfigFlow
+
+    flow = XantechConfigFlow()
+    defaults = flow._get_default_zones_text('monoprice6')
+
+    for line in defaults.strip().split('\n'):
+        zone_id = int(line.split(':')[0].strip())
+        assert zone_id >= 11, f'monoprice6 default zone {zone_id} should be >= 11'
+
+
+def test_dax88_default_zones_use_double_digit() -> None:
+    """Test that dax88 config flow defaults use double-digit zone IDs."""
+    from custom_components.xantech.config_flow import XantechConfigFlow
+
+    flow = XantechConfigFlow()
+    defaults = flow._get_default_zones_text('dax88')
+
+    for line in defaults.strip().split('\n'):
+        zone_id = int(line.split(':')[0].strip())
+        assert zone_id >= 11, f'dax88 default zone {zone_id} should be >= 11'

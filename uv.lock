@@ -1692,7 +1692,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },
     { name = "pytest-homeassistant-custom-component", marker = "extra == 'dev'", specifier = ">=0.13.0" },
-    { name = "pyxantech", specifier = ">=0.9.0" },
+    { name = "pyxantech", specifier = ">=0.10.5" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.8.0" },
 ]
 provides-extras = ["dev"]
@@ -3693,7 +3693,7 @@ wheels = [
 
 [[package]]
 name = "pyxantech"
-version = "0.10.4"
+version = "0.10.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyserial" },
@@ -3702,9 +3702,9 @@ dependencies = [
     { name = "pyyaml", version = "6.0.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
     { name = "ratelimit" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f6/3f/9c788116d68e897107690befcb0cd5a39fa015d3efb4e3a8ebf829ec5095/pyxantech-0.10.4.tar.gz", hash = "sha256:5b646e6dfd0a85f7afcc2995c8d0be2c7a04c2b9c65e8eab0ffa82dea02eb02c", size = 29038, upload-time = "2026-01-12T22:58:49.379Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/25/c7/76d0eb602a64718fbd645c74b1f48be120dd989ef14b6f6bf708e2ffd1bd/pyxantech-0.10.5.tar.gz", hash = "sha256:d4a59d5824dcc8178de72a7eb3976249e1d9c514a5c063aa37fdf19e593ce394", size = 29125, upload-time = "2026-01-14T04:07:08.315Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4d/ae/b5592337596a94e0fa22a83b7b6b78bdd2c5591695b69740f8a08d72edb9/pyxantech-0.10.4-py3-none-any.whl", hash = "sha256:d1efe07dab2f13eaa3dbb95e19bff26ec582bcec4401dddc86ccf3e9932778ff", size = 27625, upload-time = "2026-01-12T22:58:47.917Z" },
+    { url = "https://files.pythonhosted.org/packages/a1/7f/2f7c0690a6cf2fda15b46e6ef02ce42517e78f80bc03345f3cbabd71e217/pyxantech-0.10.5-py3-none-any.whl", hash = "sha256:01939233e12a96f44ccca30574146f0d907c5e01d4dc6cf1d337300af5da7513", size = 27624, upload-time = "2026-01-14T04:07:06.693Z" },
 ]
 
 [[package]]
