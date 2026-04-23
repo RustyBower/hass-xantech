@@ -260,6 +260,11 @@ class XantechConfigFlow(ConfigFlow, domain=DOMAIN):
                 '11: Living Room\n12: Kitchen\n13: Master Bedroom\n'
                 '14: Office\n15: Patio\n16: Dining Room'
             )
+        if amp_type == 'dax66':
+            return (
+                '11: Zone 1\n12: Zone 2\n13: Zone 3\n'
+                '14: Zone 4\n15: Zone 5\n16: Zone 6'
+            )
         if amp_type == 'dax88':
             return (
                 '11: Living Room\n12: Kitchen\n13: Master Bedroom\n'
